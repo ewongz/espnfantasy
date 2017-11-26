@@ -7,4 +7,4 @@ Rank the teams and show each player's overall rank and basketball stats for each
 Player ratings and ranks are scraped from espn's fantasy website and are updated every game. 
 This league is H2H 8 Cat for the 2017-2018 NBA season. 
 
-## Demo here: https://fantasybballrank.herokuapp.com/
+## https://fantasybballrank.herokuapp.com/
