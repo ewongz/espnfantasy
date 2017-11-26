@@ -1,7 +1,6 @@
 import pandas as pd
 from bs4 import BeautifulSoup
 import requests
-import numpy as np
 from flask import *
 app = Flask(__name__)
 
@@ -12,7 +11,7 @@ league = ['WONG', 'Firo', 'PHAN', 'JETH', 'DHIN',
 # espn site text for player rankings
 top50 = requests.get('http://games.espn.com/fba/playerrater?leagueId=214887&teamId=9')
 pages = [top50]
-intervals = np.arange(50, 601, 50)
+intervals = range(50, 601, 50)
 baselink = "http://games.espn.com/fba/playerrater?leagueId=214887&teamId=9&startIndex="
 
 for i in intervals:
