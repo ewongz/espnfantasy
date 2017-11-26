@@ -7,6 +7,9 @@ app = Flask(__name__)
 league = ['WONG', 'Firo', 'PHAN', 'JETH', 'DHIN',
           'MONE', 'HDP', 'cc', 'SYED', 'BOBK']
 
+dfstats = ["PLAYER", "TYPE", "FG%", "FT%", "3PM", "REB",
+           "AST", "STL", "BLK", "PTS", "2018 PlayerRating"]
+
 
 # espn site text for player rankings
 top50 = requests.get('http://games.espn.com/fba/playerrater?leagueId=214887&teamId=9')
@@ -36,9 +39,13 @@ for text in pt:
     rankings["position"] = rankings["PLAYER, TEAM POS"].apply(lambda p: p[-2:])
     rankings["PLAYER, TEAM POS"] = rankings["PLAYER, TEAM POS"].\
         apply(lambda p: p.split(",")[0])
+    # rankings.columns = colnames
     rank_tbls.append(rankings)
 
 rankings = pd.concat(rank_tbls)
+del rankings["position"]
+rankings.columns = dfstats
+print rankings.columns
 
 # Rank table for each owner
 team_players = {}
@@ -46,7 +53,7 @@ owner_ranks = {}
 buckets = []
 for owner in league:
     team = rankings.loc[rankings["TYPE"] == owner]
-    owner_ranks[owner] = team
+    print team.columns
     teamtop50 = len(rank_tbls[0].loc[rankings["TYPE"] == owner])
     teamtop100 = len(rank_tbls[1].loc[rankings["TYPE"] == owner]) + teamtop50
     teamtop150 = len(rank_tbls[2].loc[rankings["TYPE"] == owner]) + teamtop100
@@ -54,6 +61,8 @@ for owner in league:
     team["2018 PlayerRating"] = team["2018 PlayerRating"].replace("--", 0)
     team_players[owner] = [sum(team["2018 PlayerRating"]), teamtop50,
                            teamtop100, teamtop150, teamtop200]
+    del team["TYPE"]
+    owner_ranks[owner] = team
 
 statnames = ["TeamRating", "nTop50Players", "nTop100Players",
              "nTop150Players", "nTop200Players"]
@@ -78,4 +87,4 @@ def show_tables():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
