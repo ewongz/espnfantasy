@@ -4,6 +4,7 @@ Flask==0.12.2
 Flask-Cors==3.0.2
 gunicorn==19.6.0
 Jinja2==2.9.5
+lxml==3.7.0
 pandas==0.19.2
 pandas-datareader==0.3.0.post0
 requests==2.13.0
