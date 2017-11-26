@@ -1,6 +1,7 @@
 import pandas as pd
 from bs4 import BeautifulSoup
 import requests
+import numpy as np
 from flask import *
 app = Flask(__name__)
 
@@ -9,13 +10,15 @@ league = ['WONG', 'Firo', 'PHAN', 'JETH', 'DHIN',
 
 
 # espn site text for player rankings
-t1 = requests.get('http://games.espn.com/fba/playerrater?leagueId=214887&teamId=9')
-t2 = requests.get("http://games.espn.com/fba/playerrater?leagueId=214887&teamId=9&startIndex=50")
-t3 = requests.get("http://games.espn.com/fba/playerrater?leagueId=214887&teamId=9&startIndex=100")
-t4 = requests.get("http://games.espn.com/fba/playerrater?leagueId=214887&teamId=9&startIndex=150")
+top50 = requests.get('http://games.espn.com/fba/playerrater?leagueId=214887&teamId=9')
+pages = [top50]
+intervals = np.arange(50, 601, 50)
+baselink = "http://games.espn.com/fba/playerrater?leagueId=214887&teamId=9&startIndex="
 
+for i in intervals:
+    pages.append(requests.get(baselink + str(i)))
 
-ranks = [t1, t2, t3, t4]
+ranks = pages
 pt = []
 for r in ranks:
     pt.append(r.text)
@@ -49,6 +52,7 @@ for owner in league:
     teamtop100 = len(rank_tbls[1].loc[rankings["TYPE"] == owner]) + teamtop50
     teamtop150 = len(rank_tbls[2].loc[rankings["TYPE"] == owner]) + teamtop100
     teamtop200 = len(rank_tbls[3].loc[rankings["TYPE"] == owner]) + teamtop150
+    team["2018 PlayerRating"] = team["2018 PlayerRating"].replace("--", 0)
     team_players[owner] = [sum(team["2018 PlayerRating"]), teamtop50,
                            teamtop100, teamtop150, teamtop200]
 
@@ -64,9 +68,15 @@ standings = teamperformance.iloc[:, 1:len(teamperformance.columns)].\
 
 @app.route("/")
 def show_tables():
-    return render_template('view.html', tables=[standings.to_html()])
-    titles = ["Standings"]
+    ranktbl = []
+    ownernames = []
+    for owner, team in owner_ranks.iteritems():
+        ownernames.append(owner)
+        ranktbl.append(team.to_html(classes=owner))
+    return render_template('view.html',
+                           tables=[standings.to_html()] + ranktbl,
+                           titles=["na", "Team Rating"] + ownernames)
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
