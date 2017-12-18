@@ -83,7 +83,7 @@ def show_tables():
         ranktbl.append(team.to_html(classes=owner))
     return render_template('view.html',
                            tables=[standings.to_html()] + ranktbl,
-                           titles=["na", "Team Rating"] + ownernames)
+                           titles=["na", "Overall Ranking"] + ownernames)
 
 
 if __name__ == "__main__":
